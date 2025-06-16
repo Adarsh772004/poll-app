@@ -45,7 +45,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-950 to-black">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br bg-[#1c1c1c]">
       <div className="w-full max-w-md bg-white/5 backdrop-blur-lg p-8 rounded-2xl shadow-xl mx-4 border border-white/10">
         <form onSubmit={handleSubmit} className="w-full">
           <h2 className="text-3xl font-bold text-center text-white mb-2">
@@ -68,7 +68,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -85,7 +85,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 

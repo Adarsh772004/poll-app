@@ -100,8 +100,8 @@ const Login = () => {
             disabled={loading}
             className={`w-full py-2.5 rounded-lg font-semibold transition duration-300 ${
               loading
-                ? "bg-blue-500 cursor-not-allowed opacity-50"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                ? "bg-green-500 cursor-not-allowed opacity-50"
+                : "bg-green-600 hover:bg-green-800 text-white"
             }`}
           >
             {loading ? "Signing In..." : "Sign In"}
@@ -109,7 +109,7 @@ const Login = () => {
 
           <p className="mt-6 text-center text-sm text-slate-400">
             Don't have an account?{" "}
-            <Link to="/register" className="text-blue-400 hover:underline">
+            <Link to="/register" className="text-green-400 hover:underline">
               Register
             </Link>
           </p>

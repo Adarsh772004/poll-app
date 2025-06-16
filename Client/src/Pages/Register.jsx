@@ -118,8 +118,8 @@ const Register = () => {
             disabled={loading}
             className={`w-full py-2.5 rounded-lg font-semibold transition duration-300 ${
               loading
-                ? "bg-blue-500 cursor-not-allowed opacity-50"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                ? "bg-green-500 cursor-not-allowed opacity-50"
+                : "bg-green-600 hover:bg-green-800 text-white"
             }`}
           >
             {loading ? "Registering..." : "Register"}
@@ -127,7 +127,7 @@ const Register = () => {
 
           <p className="mt-6 text-center text-sm text-slate-400">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-400 hover:underline">
+            <Link to="/login" className="text-green-400 hover:underline">
               Login
             </Link>
           </p>

@@ -63,7 +63,7 @@ export default function Navbar() {
 
       {/* Mobile Dropdown Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-gray-800 text-white p-4 rounded-b-xl shadow-lg space-y-4 text-[16px]">
+        <div className="md:hidden bg-[#1c1c1c] text-white p-4 rounded-b-xl shadow-lg space-y-4 text-[16px]">
           <Link
             to="/"
             onClick={() => setMenuOpen(false)}

@@ -1,18 +1,47 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User Register:", {
-      username,
-      email,
-      password,
-    });
+    setError("");
+
+    if (!username || !email || !password) {
+      setError("Please enter your name, email, and password.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post(
+        "http://localhost:7000/poll/users/register",
+        {
+          name: username,
+          email,
+          password,
+        }
+      );
+
+      console.log("Signup successful:", response.data);
+      navigate("/login");
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+      console.error("Registration error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,11 +106,20 @@ const Register = () => {
             />
           </div>
 
+          {error && (
+            <p className="text-red-400 text-sm text-center mb-4">{error}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition duration-300"
+            disabled={loading}
+            className={`w-full py-2.5 rounded-lg font-semibold transition duration-300 ${
+              loading
+                ? "bg-blue-500 cursor-not-allowed opacity-50"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
 
           <p className="mt-6 text-center text-sm text-slate-400">

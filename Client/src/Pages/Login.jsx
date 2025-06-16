@@ -1,13 +1,47 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User Login:", { email, password });
+    setErrorMsg("");
+
+    if (!email || !password) {
+      setErrorMsg("Please enter both email and password.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post(
+        "http://localhost:7000/poll/users/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      console.log("Login successful:", response.data);
+
+      // Save token to localStorage
+      localStorage.setItem("token", response.data.token);
+
+      navigate("/");
+    } catch (error) {
+      setErrorMsg(error.response?.data?.message || "Login failed. Try again.");
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,11 +89,20 @@ const Login = () => {
             />
           </div>
 
+          {errorMsg && (
+            <p className="text-red-400 text-sm text-center mb-4">{errorMsg}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition duration-300"
+            disabled={loading}
+            className={`w-full py-2.5 rounded-lg font-semibold transition duration-300 ${
+              loading
+                ? "bg-blue-500 cursor-not-allowed opacity-50"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
           >
-            Sign In
+            {loading ? "Signing In..." : "Sign In"}
           </button>
 
           <p className="mt-6 text-center text-sm text-slate-400">

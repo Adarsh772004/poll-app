@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../Components/Custom/UseAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,86 +23,76 @@ const Login = () => {
 
     try {
       setLoading(true);
-
       const response = await axios.post(
         "http://localhost:7000/poll/users/login",
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
-      console.log("Login successful:", response.data);
-
-      // Save token to localStorage
-      localStorage.setItem("token", response.data.token);
-
+      localStorage.setItem("token", response.data.token); // Save token
+      login(response.data.user); // Update context
       navigate("/");
     } catch (error) {
       setErrorMsg(error.response?.data?.message || "Login failed. Try again.");
-      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br bg-[#1c1c1c]">
-      <div className="w-full max-w-md bg-white/5 backdrop-blur-lg p-8 rounded-2xl shadow-xl mx-4 border border-white/10">
-        <form onSubmit={handleSubmit} className="w-full">
-          <h2 className="text-3xl font-bold text-center text-white mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-[#1c1c1c]">
+      <div className="w-full max-w-md p-8 rounded-xl bg-white/5 backdrop-blur-lg mx-4 border border-white/10">
+        <form onSubmit={handleSubmit}>
+          <h2 className="text-3xl font-bold text-white text-center mb-2">
             Welcome Back 👋
           </h2>
           <p className="text-center text-slate-400 mb-6 text-sm">
-            Please enter your credentials to log in
+            Please enter your credentials
           </p>
 
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-slate-300 mb-1"
+              className="block text-sm text-slate-300 mb-1"
             >
               Email
             </label>
             <input
-              type="email"
               id="email"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-[#2a2a2a] text-white"
               placeholder="your@email.com"
-              autoComplete="email"
-              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div className="mb-6">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-slate-300 mb-1"
+              className="block text-sm text-slate-300 mb-1"
             >
               Password
             </label>
             <input
-              type="password"
               id="password"
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-[#2a2a2a] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-[#2a2a2a] text-white"
+              placeholder="Enter password"
             />
           </div>
 
           {errorMsg && (
-            <p className="text-red-400 text-sm text-center mb-4">{errorMsg}</p>
+            <p className="text-red-400 text-center text-sm mb-4">{errorMsg}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2.5 rounded-lg font-semibold transition duration-300 ${
+            className={`w-full py-2.5 rounded-lg font-semibold transition ${
               loading
-                ? "bg-green-500 cursor-not-allowed opacity-50"
+                ? "bg-green-500 opacity-50"
                 : "bg-green-600 hover:bg-green-800 text-white"
             }`}
           >

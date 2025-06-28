@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const PollCreation = () => {
   const [question, setQuestion] = useState("");
@@ -36,7 +37,7 @@ const PollCreation = () => {
     e.preventDefault();
 
     if (!question.trim() || options.some((opt) => !opt.trim())) {
-      alert("Please fill in all fields");
+      toast.warning("Please fill in all fields");
       return;
     }
 
@@ -48,12 +49,10 @@ const PollCreation = () => {
     };
 
     const existingPolls = JSON.parse(localStorage.getItem("polls") || "[]");
-
     const updatedPolls = [newPoll, ...existingPolls];
-
     localStorage.setItem("polls", JSON.stringify(updatedPolls));
 
-    
+    toast.success("Poll created!");
     navigate("/polls");
   };
 
@@ -76,10 +75,10 @@ const PollCreation = () => {
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleQuestionKeyDown}
               placeholder="Type your question here"
-              className="w-full px-4 py-3 h-12 rounded-lg border border-gray-600 
-             bg-[#1c1c1c] text-white placeholder-gray-500 
-             focus:outline-none focus:border-green-500 
-             focus:bg-[#222] focus:ring-2 focus:ring-green-500"
+              className="w-full px-4 py-3 h-12 rounded-lg border border-gray-500 
+                bg-[#2a2a2a] text-white 
+                focus:outline-none focus:border-green-500 
+                focus:bg-[#222] focus:ring-2 focus:ring-green-500"
             />
           </div>
 
@@ -98,10 +97,10 @@ const PollCreation = () => {
                 value={opt}
                 onChange={(e) => handleOptionChange(index, e.target.value)}
                 onKeyDown={(e) => handleOptionKeyDown(e, index)}
-                className="w-full mb-3 px-4 py-3 h-12 rounded-lg border border-gray-600 
-             bg-[#1c1c1c] text-white placeholder-gray-500 
-             focus:outline-none focus:border-green-500 
-             focus:bg-[#222] focus:ring-2 focus:ring-green-500"
+                className="w-full mb-3 px-4 py-3 h-12 rounded-lg border border-gray-500 
+                  bg-[#2a2a2a] text-white 
+                  focus:outline-none focus:border-green-500 
+                  focus:bg-[#222] focus:ring-2 focus:ring-green-500"
               />
             ))}
           </div>

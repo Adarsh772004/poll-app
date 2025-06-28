@@ -1,5 +1,8 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import UserLayout from "./Components/Layout/UserLayout";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
@@ -15,34 +18,38 @@ import RequireAuth from "./Pages/RequireAuth";
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<UserLayout />}>
-        <Route index element={<Home />} />
-        <Route
-          path="create"
-          element={
-            <RequireAuth>
-              <PollCreation />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="demo"
-          element={
-            <RequireAuth>
-              <DemoPoll />
-            </RequireAuth>
-          }
-        />
-        <Route path="about" element={<About />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="results" element={<DemoPollResult />} />
-        <Route path="polls" element={<ViewPolls />} />
-        <Route path="/vote/:id" element={<PollVote />} />
-        <Route path="/results/:id" element={<PollResult />} />
-      </Route>
-    </Routes>
+    <>
+      {/* Toast container for global notifications */}
+      <ToastContainer position="top-right" autoClose={3000} />
+      <Routes>
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<Home />} />
+          <Route
+            path="create"
+            element={
+              <RequireAuth>
+                <PollCreation />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="demo"
+            element={
+              <RequireAuth>
+                <DemoPoll />
+              </RequireAuth>
+            }
+          />
+          <Route path="about" element={<About />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="results" element={<DemoPollResult />} />
+          <Route path="polls" element={<ViewPolls />} />
+          <Route path="/vote/:id" element={<PollVote />} />
+          <Route path="/results/:id" element={<PollResult />} />
+        </Route>
+      </Routes>
+    </>
   );
 };
 

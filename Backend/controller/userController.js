@@ -19,7 +19,7 @@ const Register = async (req, res) => {
     await user.save();
 
     //  Create JWT payload
-    const payload = { user: { id: user._id} };
+    const payload = { id: user._id }; 
 
     // Sign and return the token along with user data
     jwt.sign(

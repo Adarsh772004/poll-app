@@ -1,85 +1,70 @@
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, MousePointerClick } from "lucide-react";
+import axios from "../api/axiosInstance";
+import { toast } from "react-toastify";
+import { FaArrowLeft } from "react-icons/fa";
+import { FaHandPointer } from "react-icons/fa";
 
 const PollVote = () => {
-  const location = useLocation();
+  const { state: poll } = useLocation();
   const navigate = useNavigate();
-  const poll = location.state;
+  const [selected, setSelected] = useState("");
 
-  const [selectedOption, setSelectedOption] = useState("");
+  const submitVote = async () => {
+    if (!selected) return toast.warning("Please select an option");
 
-  const handleVote = () => {
-    if (!selectedOption) {
-      alert("Please select an option before voting.");
-      return;
+    try {
+      const res = await axios.post(`/${poll._id}/vote`, { option: selected });
+      toast.success("Vote submitted!");
+      navigate(`/results/${poll._id}`, { state: res.data });
+    } catch (err) {
+      toast.error("Vote failed");
     }
-
-    // Get current polls from localStorage
-    const polls = JSON.parse(localStorage.getItem("polls")) || [];
-
-    // Update the votes
-    const updatedPolls = polls.map((p) => {
-      if (p.id === poll.id) {
-        return {
-          ...p,
-          votes: {
-            ...p.votes,
-            [selectedOption]: (p.votes?.[selectedOption] || 0) + 1,
-          },
-        };
-      }
-      return p;
-    });
-
-    // Save updated polls to localStorage
-    localStorage.setItem("polls", JSON.stringify(updatedPolls));
-
-    // Navigate to results page with updated poll
-    const updatedPoll = updatedPolls.find((p) => p.id === poll.id);
-    navigate(`/results/${poll.id}`, { state: updatedPoll });
   };
 
   return (
-    <div className="min-h-screen bg-[#1c1c1c] text-white flex justify-center items-center p-4">
-      <div className="w-full max-w-xl border p-6 rounded-2xl border-gray-600">
-        <h2 className="text-2xl font-bold mb-6">{poll.question}</h2>
-        <p className="mb-4 font-medium">Make your choice:</p>
-        <div className="space-y-3 mb-6">
-          {poll.options.map((option, idx) => (
+    <div className="min-h-screen bg-[#1c1c1c] text-white p-6 flex items-center justify-center">
+      <div className="bg-[#2a2a2a] p-6 w-full max-w-md rounded-2xl shadow-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">{poll.question}</h2>
+        <p className="mb-4 font-semibold text-lg">Make your choice:</p>
+        <div className="space-y-3">
+          {poll.options.map((opt, idx) => (
             <label
               key={idx}
-              className={`flex items-center px-4 py-3 rounded-lg cursor-pointer bg-[#2a2a2a] border ${
-                selectedOption === option
-                  ? "border-green-500"
-                  : "border-gray-700"
+              className={`flex items-center px-4 py-3 rounded-lg border-2 cursor-pointer ${
+                selected === opt
+                  ? "border-green-500 bg-[#3a3a3a]"
+                  : "border-[#3a3a3a] bg-[#2a2a2a]"
               }`}
+              onClick={() => setSelected(opt)}
             >
               <input
                 type="radio"
-                name="pollOption"
-                value={option}
-                checked={selectedOption === option}
-                onChange={() => setSelectedOption(option)}
-                className="mr-3 w-5 h-5"
+                name="poll-option"
+                value={opt}
+                checked={selected === opt}
+                onChange={() => setSelected(opt)}
+                className="form-radio text-green-500 mr-3"
               />
-              <span className="font-semibold">{option}</span>
+              <span className="text-white font-medium">{opt}</span>
             </label>
           ))}
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex justify-between mt-6 gap-4">
           <button
-            onClick={() => navigate("/polls")}
-            className="flex-1 bg-white text-black py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2"
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center gap-2 bg-white text-black font-bold px-5 py-2 rounded-xl hover:bg-gray-200 w-full"
           >
-            <ArrowLeft /> Back
+            <FaArrowLeft />
+            Back
           </button>
           <button
-            onClick={handleVote}
-            className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2"
+            onClick={submitVote}
+            className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-black font-bold px-5 py-2 rounded-xl w-full"
           >
-            <MousePointerClick /> Vote
+            <FaHandPointer />
+            Vote
           </button>
         </div>
       </div>

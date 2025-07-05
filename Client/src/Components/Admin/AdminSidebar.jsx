@@ -1,24 +1,93 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaUser,
+  FaChartBar,
+  FaPoll,
+  FaUsers,
+  FaFlag,
+  FaSignOutAlt,
+} from "react-icons/fa";
+import { useRef, useEffect } from "react";
 
-const AdminSidebar = () => {
-  const { pathname } = useLocation();
+const AdminSidebar = ({ isOpen, toggleDropdown, dropdown, setDropdown }) => {
+  const dropdownRef = useRef();
+  const navigate = useNavigate();
 
-  const linkClass = (path) =>
-    `block px-4 py-2 rounded hover:bg-gray-200 ${
-      pathname === path ? "bg-gray-300 font-semibold" : ""
-    }`;
+  // Close the dropdown when clicking outside
+  useEffect(() => {
+    const closeDropdown = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeDropdown);
+    return () => document.removeEventListener("mousedown", closeDropdown);
+  }, [setDropdown]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
-    <div className="w-64 h-screen bg-gray-100 p-4 shadow">
-      <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
-      <nav className="flex flex-col gap-2">
-        <Link to="/admin" className={linkClass("/admin")}>Dashboard</Link>
-        <Link to="/admin/polls" className={linkClass("/admin/polls")}>Polls</Link>
-        <Link to="/admin/users" className={linkClass("/admin/users")}>Users</Link>
-        <Link to="/admin/reports" className={linkClass("/admin/reports")}>Reports</Link>
-        <Link to="/admin/settings" className={linkClass("/admin/settings")}>Settings</Link>
-      </nav>
-    </div>
+    <aside
+      className={`bg-gray-800 text-white w-64 h-screen flex flex-col justify-between p-4 transform ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      } md:translate-x-0 fixed md:relative top-0 left-0 transition-transform duration-300 z-50`}
+    >
+      {/* Top section */}
+      <div>
+        <h2 className="text-2xl font-bold text-center mb-6">Admin Hub</h2>
+        <nav className="flex flex-col gap-4">
+          <Link
+            to="/admin"
+            className="hover:text-yellow-400 flex items-center gap-2"
+          >
+            <FaChartBar /> Dashboard
+          </Link>
+          <Link
+            to="/admin/polls"
+            className="hover:text-yellow-400 flex items-center gap-2"
+          >
+            <FaPoll /> Poll
+          </Link>
+          <Link
+            to="/admin/users"
+            className="hover:text-yellow-400 flex items-center gap-2"
+          >
+            <FaUsers /> User
+          </Link>
+          <Link
+            to="/admin/reports"
+            className="hover:text-yellow-400 flex items-center gap-2"
+          >
+            <FaFlag /> Report
+          </Link>
+        </nav>
+      </div>
+
+      {/* Bottom section - Admin + Dropdown */}
+      <div className="pt-4 border-t relative" ref={dropdownRef}>
+        <button
+          onClick={toggleDropdown}
+          className="flex items-center gap-2 hover:text-yellow-400"
+        >
+          <FaUser /> Admin
+        </button>
+
+        {dropdown && (
+          <div className="absolute left-0 bottom-full mb-2 w-32 bg-white text-gray-800 rounded shadow-lg z-50 border border-gray-200">
+            <button
+              onClick={handleSignOut}
+              className="w-full px-4 py-2 text-left hover:bg-gray-300  flex items-center gap-2"
+            >
+              <FaSignOutAlt /> Sign Out
+            </button>
+          </div>
+        )}
+      </div>
+    </aside>
   );
 };
 

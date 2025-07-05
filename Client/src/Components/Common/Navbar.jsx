@@ -7,6 +7,7 @@ import {
   FaMousePointer,
   FaInfoCircle,
   FaLock,
+  FaUserCircle,
 } from "react-icons/fa";
 import Logo from "../../assets/favicon.png";
 import avatar from "../../assets/avatar.png";
@@ -15,6 +16,9 @@ import { useAuth } from "../Custom/UseAuth";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
@@ -24,7 +28,7 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  // Close profile dropdown if clicked outside
+  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -33,13 +37,22 @@ export default function Navbar() {
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Detect scroll to add shadow
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <nav className="bg-[#1e1e1e] text-white border-none shadow-none">
+    <nav
+      className={`bg-[#1e1e1e] text-white sticky top-0 z-50 transition-shadow duration-300 ${
+        scrolled ? "shadow-lg" : "shadow-none"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center relative">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 text-3xl font-bold">
@@ -51,7 +64,7 @@ export default function Navbar() {
           <p className="ml-2 select-none">PollApp</p>
         </Link>
 
-        {/* Desktop Menu */}
+        {/* Desktop Nav */}
         <div className="hidden md:flex justify-center flex-1 space-x-8 font-semibold text-xl">
           <Link to="/" className="hover:text-green-400">
             Home
@@ -67,7 +80,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Profile/Auth */}
+        {/* Desktop Auth/Profile */}
         <div className="hidden md:flex items-center space-x-4 font-semibold text-xl relative">
           {!user ? (
             <>
@@ -90,7 +103,7 @@ export default function Navbar() {
                 className="w-12 h-12 rounded-full border-2 border-white hover:border-green-400 transition duration-200 cursor-pointer"
               />
               {profileOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-[#2d2d2d] text-white rounded-lg shadow-lg z-50 p-4">
+                <div className="absolute right-0 mt-2 w-64 bg-[#2d2d2d] text-white rounded-lg shadow-lg z-50 p-4 transition duration-300 ease-in-out">
                   <div className="flex items-center space-x-3 mb-4 border-b border-gray-600 pb-4">
                     <img
                       src={avatar}
@@ -148,15 +161,22 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <button
           className="md:hidden text-2xl"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={() => {
+            setMenuOpen(!menuOpen);
+            setMobileProfileOpen(false);
+          }}
         >
           {menuOpen ? <IoMdClose /> : <IoMdMenu />}
         </button>
       </div>
 
       {/* Mobile Dropdown */}
-      {menuOpen && (
-        <div className="md:hidden bg-[#1c1c1c] text-white p-4 rounded-b-xl shadow-lg space-y-4 text-[16px]">
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          menuOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="bg-[#1c1c1c] text-white p-4 rounded-b-xl shadow-lg space-y-4 text-[16px]">
           <Link
             to="/"
             onClick={() => setMenuOpen(false)}
@@ -211,52 +231,65 @@ export default function Navbar() {
               </div>
             </>
           ) : (
-            <div className="text-sm mt-4 bg-white text-black p-4 rounded-md space-y-2">
-              <div>
-                <p className="font-bold">{user.name}</p>
-                <p className="text-gray-600">{user.email}</p>
-              </div>
-              <Link
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className="block hover:text-green-600"
-              >
-                Home
-              </Link>
-              <Link
-                to="/polls"
-                onClick={() => setMenuOpen(false)}
-                className="block hover:text-green-600"
-              >
-                View Polls
-              </Link>
-              <Link
-                to="/about"
-                onClick={() => setMenuOpen(false)}
-                className="block hover:text-green-600"
-              >
-                About
-              </Link>
-              <Link
-                to="/change-password"
-                onClick={() => setMenuOpen(false)}
-                className="block hover:text-green-600"
-              >
-                Reset Password
-              </Link>
+            <>
               <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  handleLogout();
-                }}
-                className="block text-left text-red-500 hover:text-red-400"
+                onClick={() => setMobileProfileOpen((prev) => !prev)}
+                className="flex items-center space-x-2 font-semibold hover:text-green-400"
               >
-                Sign Out
+                <FaUserCircle className="text-xl" />
+                <span>{mobileProfileOpen ? "Hide" : "Show"} Profile</span>
               </button>
-            </div>
+
+              <div
+                className={`transition-all duration-300 ease-in-out transform ${
+                  mobileProfileOpen
+                    ? "opacity-100 max-h-screen mt-4"
+                    : "opacity-0 max-h-0 overflow-hidden"
+                } bg-[#2a2a2a] text-white p-4 rounded-md space-y-2`}
+              >
+                <div className="flex items-center space-x-3 border-b border-gray-600 pb-4 mb-3">
+                  <img
+                    src={avatar}
+                    alt="User Avatar"
+                    className="w-12 h-12 rounded-full border border-white"
+                  />
+                  <div>
+                    <p className="font-bold">{user.name}</p>
+                    <p className="text-gray-400 text-sm">{user.email}</p>
+                  </div>
+                </div>
+
+                <Link
+                  to="/polls"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center space-x-2 hover:text-green-600"
+                >
+                  <FaChartBar />
+                  <span>View Polls</span>
+                </Link>
+                <Link
+                  to="/change-password"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center space-x-2 hover:text-green-600"
+                >
+                  <FaLock />
+                  <span>Reset Password</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="flex items-center space-x-2 text-red-500 hover:text-red-800"
+                >
+                  <IoMdClose />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </>
           )}
         </div>
-      )}
+      </div>
     </nav>
   );
 }

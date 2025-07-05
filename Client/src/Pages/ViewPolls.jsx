@@ -90,7 +90,7 @@ const ViewPolls = () => {
                 onClick={() =>
                   navigate(`/results/${poll._id}`, { state: poll })
                 }
-                className="bg-gray-100 text-black px-3 py-1.5 rounded-full text-sm flex items-center gap-1 hover:bg-green-500 transition"
+                className="bg-gray-300 text-black px-3 py-1.5 rounded-full text-sm flex items-center gap-1 hover:bg-green-500 transition"
               >
                 <FaThumbsUp size={14} />
                 Results
@@ -99,7 +99,7 @@ const ViewPolls = () => {
               {user && poll.createdBy === user._id && (
                 <button
                   onClick={() => deletePoll(poll._id)}
-                  className="bg-white text-black px-3 py-1.5 rounded-full text-sm flex items-center gap-1 hover:bg-red-500 transition"
+                  className="bg-gray-300 text-black px-3 py-1.5 rounded-full text-sm flex items-center gap-1 hover:bg-red-500 transition"
                 >
                   <FaTrash size={14} />
                   Delete

@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// this middleware check if user is logged in using jwt
-const auth = async (req, res, next) => {
+// Middleware to check if user is authenticated
+const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -13,7 +13,12 @@ const auth = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.user.id).select("-password");
+
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     req.user = user;
     next();
   } catch (error) {
@@ -21,4 +26,15 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth;
+// Middleware to check if user is admin
+const isAdmin = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admin access only" });
+  }
+  next();
+};
+
+module.exports = {
+  verifyToken,
+  isAdmin,
+};

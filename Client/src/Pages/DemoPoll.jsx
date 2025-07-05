@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ThumbsUp, BarChart2 } from "lucide-react";
+import { BarChart2 } from "lucide-react";
+import { FaHandPointer } from "react-icons/fa";
 
 const pollOptions = ["Excellent", "Good", "Poor"];
 
@@ -82,7 +83,7 @@ export default function DemoPoll() {
                 : "bg-green-500 hover:bg-green-600 text-black"
             }`}
           >
-            <ThumbsUp size={18} />
+            <FaHandPointer size={18} /> 
             {hasVoted ? "Voted" : "Vote"}
           </button>
 

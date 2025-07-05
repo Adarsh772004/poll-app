@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import axios from "../api/axiosInstance";
 
 const PollCreation = () => {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", "", ""]);
-
   const questionRef = useRef(null);
   const optionRefs = useRef([]);
   const navigate = useNavigate();
@@ -16,24 +16,18 @@ const PollCreation = () => {
     setOptions(updated);
   };
 
-  const handleQuestionKeyDown = (e) => {
+  const handleKeyDown = (e, index) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      optionRefs.current[0]?.focus();
-    }
-  };
-
-  const handleOptionKeyDown = (e, index) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const nextIndex = index + 1;
-      if (nextIndex < options.length) {
-        optionRefs.current[nextIndex]?.focus();
+      if (index === -1) {
+        optionRefs.current[0]?.focus();
+      } else if (index < options.length - 1) {
+        optionRefs.current[index + 1]?.focus();
       }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!question.trim() || options.some((opt) => !opt.trim())) {
@@ -41,74 +35,61 @@ const PollCreation = () => {
       return;
     }
 
-    const newPoll = {
-      id: Date.now(),
-      question,
-      options,
-      date: new Date().toISOString(),
-    };
-
-    const existingPolls = JSON.parse(localStorage.getItem("polls") || "[]");
-    const updatedPolls = [newPoll, ...existingPolls];
-    localStorage.setItem("polls", JSON.stringify(updatedPolls));
-
-    toast.success("Poll created!");
-    navigate("/polls");
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "/",
+        { question, options },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Poll created successfully!");
+      navigate("/polls");
+    } catch (err) {
+      console.error("Poll creation error:", err);
+      toast.error("Failed to create poll");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#1c1c1c] flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-md bg-[#2a2a2a] text-white p-8 rounded-2xl shadow-2xl border border-gray-700 mx-4">
+    <div className="min-h-screen bg-[#121212] flex justify-center items-center px-4">
+      <div className="w-full max-w-md bg-[#1e1e1e] text-white p-8 rounded-2xl shadow-2xl border border-[#333]">
         <h2 className="text-3xl font-bold text-center mb-6">Create a Poll</h2>
+        <form onSubmit={handleSubmit}>
+          <label className="block text-sm font-semibold mb-2">
+            Poll Question
+          </label>
+          <input
+            type="text"
+            ref={questionRef}
+            value={question}
+            placeholder="Type your question here"
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, -1)}
+            className="w-full mb-5 px-4 py-3 rounded-lg bg-[#2b2b2b] border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
 
-        <form className="w-full" onSubmit={handleSubmit}>
-          {/* Poll Question */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Poll Question
-            </label>
+          <label className="block text-sm font-semibold mb-2">
+            Answer Options
+          </label>
+          {options.map((opt, idx) => (
             <input
-              type="text"
-              ref={questionRef}
-              value={question}
-              required
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={handleQuestionKeyDown}
-              placeholder="Type your question here"
-              className="w-full px-4 py-3 h-12 rounded-lg border border-gray-500 
-                bg-[#2a2a2a] text-white 
-                focus:outline-none focus:border-green-500 
-                focus:bg-[#222] focus:ring-2 focus:ring-green-500"
+              key={idx}
+              ref={(el) => (optionRefs.current[idx] = el)}
+              value={opt}
+              placeholder={`Option ${idx + 1}`}
+              onChange={(e) => handleOptionChange(idx, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, idx)}
+              className="w-full mb-3 px-4 py-3 rounded-lg bg-[#2b2b2b] border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
-          </div>
+          ))}
 
-          {/* Answer Options */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Answer Options
-            </label>
-            {options.map((opt, index) => (
-              <input
-                key={index}
-                type="text"
-                required
-                ref={(el) => (optionRefs.current[index] = el)}
-                placeholder={`Option ${index + 1}`}
-                value={opt}
-                onChange={(e) => handleOptionChange(index, e.target.value)}
-                onKeyDown={(e) => handleOptionKeyDown(e, index)}
-                className="w-full mb-3 px-4 py-3 h-12 rounded-lg border border-gray-500 
-                  bg-[#2a2a2a] text-white 
-                  focus:outline-none focus:border-green-500 
-                  focus:bg-[#222] focus:ring-2 focus:ring-green-500"
-              />
-            ))}
-          </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-green-500 hover:bg-green-800 text-white py-2.5 rounded-lg font-semibold transition duration-300"
+            className="w-full mt-6 bg-white hover:bg-gray-200 text-black font-semibold py-3 rounded-lg transition"
           >
             Create Poll
           </button>

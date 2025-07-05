@@ -10,33 +10,40 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅
+  const { login } = useAuth(); 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMsg("");
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErrorMsg("");
 
-    if (!email || !password) {
-      setErrorMsg("Please enter both email and password.");
-      return;
-    }
+  if (!email || !password) {
+    setErrorMsg("Please enter both email and password.");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        "http://localhost:7000/poll/users/login",
-        { email, password }
-      );
+  try {
+    setLoading(true);
+    const response = await axios.post(
+      "http://localhost:7000/poll/users/login",
+      { email, password }
+    );
 
-      localStorage.setItem("token", response.data.token); // Save token
-      login(response.data.user); // Update context
+    localStorage.setItem("token", response.data.token); 
+    login(response.data.user); 
+
+    // Check user role and navigate
+    if (response.data.user.role === "admin") {
+      navigate("/admin");
+    } else {
       navigate("/");
-    } catch (error) {
-      setErrorMsg(error.response?.data?.message || "Login failed. Try again.");
-    } finally {
-      setLoading(false);
     }
-  };
+
+  } catch (error) {
+    setErrorMsg(error.response?.data?.message || "Login failed. Try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1c1c1c]">

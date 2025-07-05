@@ -1,97 +1,82 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
-
-// @route POST /poll/users/register
-// @desc Register a new user
-// @access Public
+// Register a new user
 const Register = async (req, res) => {
   const { name, email, password } = req.body;
-  try {
-    // Registration Logic
-    let user = await User.findOne({ email });
 
-    if (user) {
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    user = new User({ name, email, password });
-    await user.save();
+    // Create new user
+    const newUser = new User({ name, email, password });
+    await newUser.save();
 
-    //  Create JWT payload
-    const payload = { id: user._id }; 
+    // Create JWT token
+    const payload = { id: newUser._id, role: newUser.role };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "40h",
+    });
 
-    // Sign and return the token along with user data
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "40h" },
-      (err, token) => {
-        if (err) throw err;
-
-        // Send the user and token in response
-        res.status(201).json({
-          user: {
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-          },
-          token,
-        });
-      }
-    );
-  } catch (error) {
-    console.error("Error in Register:", error.message);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    // Return user info and token
+    res.status(201).json({
+      user: {
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        status: newUser.status,
+      },
+      token,
+    });
+  } catch (err) {
+    console.error("Register Error:", err.message);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// @route POST /poll/users/login
-// @desc Authenticate user
-// @access Public
+// Login existing user
 const Login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find the user by email
-    let user = await User.findOne({ email });
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
-    if (!user) return req.status(400).json({ message: "Invalid Credentials" });
+    // Match entered password with hashed password
     const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid Credentials" });
+    // Create JWT token
+    const payload = { id: user._id, role: user.role };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "40h",
+    });
 
-    //  Create JWT payload
-    const payload = { user: { id: user._id, role: user.role } };
-
-    // Sign and return the token along with user data
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "40h" },
-      (err, token) => {
-        if (err) throw err;
-
-        // Send the user and token in response
-        res.json({
-          user: {
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-          },
-          token,
-        });
-      }
-    );
-  } catch (error) {
-    console.error("Error in Login:", error.message);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    // Return user info and token
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      },
+      token,
+    });
+  } catch (err) {
+    console.error("Login Error:", err.message);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-
-module.exports = {
-  Register,
-  Login,
-};
+module.exports = { Register, Login };

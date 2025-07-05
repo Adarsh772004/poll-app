@@ -1,7 +1,7 @@
 const Poll = require("../models/polls");
 
-// @desc Create a poll
-exports.createPoll = async (req, res) => {
+// Create a new poll
+const createPoll = async (req, res) => {
   const { question, options } = req.body;
 
   if (!question || !options || options.length < 2) {
@@ -15,27 +15,30 @@ exports.createPoll = async (req, res) => {
       question,
       options,
       createdBy: req.user._id,
+      status: "pending", // Admin will approve or reject
     });
 
     await newPoll.save();
     res.status(201).json(newPoll);
-  } catch (error) {
+  } catch (err) {
+    console.error("Create Poll Error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// @desc Get all polls
-exports.getPolls = async (req, res) => {
+// Get all approved polls
+const getPolls = async (req, res) => {
   try {
-    const polls = await Poll.find().sort({ date: -1 });
+    const polls = await Poll.find({ status: "approved" }).sort({ date: -1 });
     res.json(polls);
-  } catch (error) {
+  } catch (err) {
+    console.error("Get Polls Error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// @desc Vote on a poll
-exports.votePoll = async (req, res) => {
+// Vote on a poll
+const votePoll = async (req, res) => {
   const { option } = req.body;
 
   try {
@@ -46,26 +49,33 @@ exports.votePoll = async (req, res) => {
     await poll.save();
 
     res.json(poll);
-  } catch (error) {
+  } catch (err) {
+    console.error("Vote Poll Error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// @desc Delete own poll
-exports.deletePoll = async (req, res) => {
+// Delete a poll
+const deletePoll = async (req, res) => {
   try {
     const poll = await Poll.findById(req.params.id);
     if (!poll) return res.status(404).json({ message: "Poll not found" });
 
     if (poll.createdBy.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: "You can only delete your own polls" });
+      return res.status(403).json({ message: "Unauthorized" });
     }
 
     await Poll.findByIdAndDelete(req.params.id);
-    res.json({ message: "Poll deleted successfully" });
-  } catch (error) {
+    res.json({ message: "Poll deleted" });
+  } catch (err) {
+    console.error("Delete Poll Error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+module.exports = {
+  createPoll,
+  getPolls,
+  votePoll,
+  deletePoll,
 };

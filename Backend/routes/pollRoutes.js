@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const PollController = require("../controller/pollController");
-const auth = require("../middleware/auth");
+const { verifyToken } = require("../middleware/auth");
 
 // Create poll
-router.post("/", auth, PollController.createPoll);
+router.post("/", verifyToken, PollController.createPoll);
 
 // Get all polls
 router.get("/", PollController.getPolls);
@@ -13,6 +13,6 @@ router.get("/", PollController.getPolls);
 router.post("/:id/vote", PollController.votePoll);
 
 // Delete own poll
-router.delete("/:id", auth, PollController.deletePoll);
+router.delete("/:id", verifyToken, PollController.deletePoll);
 
 module.exports = router;

@@ -8,4 +8,10 @@ router.post("/register", UserController.Register);
 // User Login
 router.post("/login", UserController.Login);
 
+// Forget Password
+router.post("/forgot-password", UserController.ForgotPassword);
+
+// Reset Password
+router.post("/reset-password/:token", UserController.ResetPassword);
+
 module.exports = router;

@@ -138,7 +138,7 @@ export default function Navbar() {
                       <span>About</span>
                     </Link>
                     <Link
-                      to="/change-password"
+                      to="/forgotpassword"
                       className="flex items-center space-x-2 hover:text-green-400"
                     >
                       <FaLock />
@@ -268,7 +268,7 @@ export default function Navbar() {
                   <span>View Polls</span>
                 </Link>
                 <Link
-                  to="/change-password"
+                  to="/forgotpassword"
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center space-x-2 hover:text-green-600"
                 >

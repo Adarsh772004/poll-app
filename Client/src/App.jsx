@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import UserLayout from "./Components/Layout/UserLayout";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
+import ForgotPassword from "./Pages/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword";
 import Home from "./Pages/Home";
 import PollCreation from "./Pages/PollCreation";
 import DemoPoll from "./Pages/DemoPoll";
@@ -56,6 +58,8 @@ const App = () => {
           <Route path="about" element={<About />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="/forgotpassword" element={<ForgotPassword />} />
+          <Route path="/resetpassword/:token" element={<ResetPassword />} />
           <Route path="results" element={<DemoPollResult />} />
           <Route path="polls" element={<ViewPolls />} />
           <Route path="/vote/:id" element={<PollVote />} />

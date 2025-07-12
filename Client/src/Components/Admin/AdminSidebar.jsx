@@ -58,12 +58,12 @@ const AdminSidebar = ({ isOpen, toggleDropdown, dropdown, setDropdown }) => {
           >
             <FaUsers /> User
           </Link>
-          <Link
+          {/* <Link
             to="/admin/reports"
             className="hover:text-yellow-400 flex items-center gap-2"
           >
             <FaFlag /> Report
-          </Link>
+          </Link> */}
         </nav>
       </div>
 

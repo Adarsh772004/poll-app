@@ -4,13 +4,15 @@ const Poll = require("../models/polls");
 // Get all users and their poll count
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
-    const polls = await Poll.find();
+    const [users, polls] = await Promise.all([
+      User.find().select("-password"),
+      Poll.find(),
+    ]);
 
-    const pollCounts = {};
-    polls.forEach((p) => {
-      pollCounts[p.createdBy] = (pollCounts[p.createdBy] || 0) + 1;
-    });
+    const pollCounts = polls.reduce((acc, poll) => {
+      acc[poll.createdBy] = (acc[poll.createdBy] || 0) + 1;
+      return acc;
+    }, {});
 
     const userData = users.map((user) => ({
       ...user.toObject(),
@@ -18,7 +20,8 @@ const getAllUsers = async (req, res) => {
     }));
 
     res.json(userData);
-  } catch (error) {
+  } catch (err) {
+    console.error("getAllUsers error:", err);
     res.status(500).json({ error: "Failed to fetch users" });
   }
 };

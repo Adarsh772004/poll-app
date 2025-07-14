@@ -15,7 +15,7 @@ const createPoll = async (req, res) => {
       question,
       options,
       createdBy: req.user._id,
-      status: "pending", // Admin will approve or reject
+      status: "pending",
     });
 
     await newPoll.save();

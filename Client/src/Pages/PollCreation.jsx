@@ -89,7 +89,7 @@ const PollCreation = () => {
 
           <button
             type="submit"
-            className="w-full mt-6 bg-white hover:bg-gray-200 text-black font-semibold py-3 rounded-lg transition"
+            className="w-full mt-6 bg-green-500 hover:bg-green-800 text-black font-semibold py-3 rounded-lg transition"
           >
             Create Poll
           </button>
